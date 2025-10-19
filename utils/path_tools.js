@@ -33,6 +33,7 @@ function computeRunFolder(baseDir){
 function ensureSubdirs(runDir){
     const dirs = { //lista de subpastas
         runDir, 
+        resultsDir: path.join(runDir, 'test-results'),
         screenshotsDir: path.join(runDir, 'screenshots'),
     };
 
@@ -40,8 +41,9 @@ function ensureSubdirs(runDir){
         if (!fs.existsSync(d)){ //se não existir o screenshot
             fs.mkdirSync(d, {recursive: true});
         }
-        return dirs;
-    })
+    });
+    
+    return dirs;
 }
 
 //Exportar as funções

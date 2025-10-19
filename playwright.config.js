@@ -1,5 +1,18 @@
 // @ts-check
 const { defineConfig, devices } = require('@playwright/test');
+const path = require('path');
+const { snap } = require('./utils/snap');
+const { computeRunFolder, ensureSubdirs } = require('./utils/path_tools');
+
+//Diretório de artefatos
+const ARTIFACTS_ROOT = path.join(__dirname, 'artifacts');
+const runDir = computeRunFolder(ARTIFACTS_ROOT);
+const { screenshotsDir, resultsDir } = ensureSubdirs(runDir);
+
+//Expõe caminhos de diretórios como variáveis de ambiente
+process.env.RUN_DIR = runDir;
+process.env.SCREENSHOTS_DIR = screenshotsDir;
+
 
 /**
  * Read environment variables from file.
@@ -8,32 +21,30 @@ const { defineConfig, devices } = require('@playwright/test');
 // require('dotenv').config({ path: path.resolve(__dirname, '.env') });
 
 /**
- * @see https://playwright.dev/docs/test-configuration
+ * /** @see https://playwright.dev/docs/test-configuration
  */
 module.exports = defineConfig({
   testDir: './tests',
+  timeout: 30000,
+  fullyParallel: true,
+  outputDir: resultsDir,
+  forbidOnly: !!process.env.CI,
+  retries: process.env.CI ? 2 : 0,
+  workers: process.env.CI ? 1 : undefined,
+  reporter: 'html',
+  use: {
+    baseURL: 'http://127.0.0.1:3000', //Alterar para a URL do site que será testado
+    headless: false,
+    screenshot: 'only-on-failure', //apenas quando der erro
+    video: 'retain-on-failure', //salva o vídeo se der erro
+    trace: 'retain-on-failure', //salta o trace se der erro
+    launchOptions: {
+      slowMo: 500, //slow motion
+    },
+  },
   
 
-  /* Run tests in files in parallel */
-  fullyParallel: true,
-  /* Fail the build on CI if you accidentally left test.only in the source code. */
-  forbidOnly: !!process.env.CI,
-  /* Retry on CI only */
-  retries: process.env.CI ? 2 : 0,
-  /* Opt out of parallel tests on CI. */
-  workers: process.env.CI ? 1 : undefined,
-  /* Reporter to use. See https://playwright.dev/docs/test-reporters */
-  reporter: 'html',
-  /* Shared settings for all the projects below. See https://playwright.dev/docs/api/class-testoptions. */
-  use: {
-    /* Base URL to use in actions like `await page.goto('/')`. */
-    // baseURL: 'http://127.0.0.1:3000',
-
-    /* Collect trace when retrying the failed test. See https://playwright.dev/docs/trace-viewer */
-    trace: 'on',
-  },
-
-  /* Configure projects for major browsers */
+  //Configuração dos projetos
   projects: [
     {
       name: 'chromium',
