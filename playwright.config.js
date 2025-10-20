@@ -33,7 +33,7 @@ module.exports = defineConfig({
   workers: process.env.CI ? 1 : undefined,
   reporter: 'html',
   use: {
-    baseURL: 'http://127.0.0.1:3000', //Alterar para a URL do site que será testado
+    baseURL: 'https://www.saucedemo.com/', //Alterar para a URL do site que será testado
     headless: false,
     screenshot: 'only-on-failure', //apenas quando der erro
     video: 'retain-on-failure', //salva o vídeo se der erro
